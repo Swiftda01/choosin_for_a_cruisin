@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Line:</strong>
+  <%= @cruise.line %>
+</p>
+
+<p>
+  <strong>Code:</strong>
+  <%= @cruise.code %>
+</p>
+
+<p>
+  <strong>Start:</strong>
+  <%= @cruise.start %>
+</p>
+
+<p>
+  <strong>Days:</strong>
+  <%= @cruise.days %>
+</p>
+
+<%= link_to 'Edit', edit_cruise_path(@cruise) %> |
+<%= link_to 'Back', cruises_path %>
