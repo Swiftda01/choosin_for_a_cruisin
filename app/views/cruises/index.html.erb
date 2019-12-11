@@ -1,11 +1,25 @@
+<link rel='stylesheet' type='text/css' href='/tomtom_sdk/map.css'/>
+<script src='/tomtom_sdk/tomtom.min.js'></script>
+
 <p id="notice"><%= notice %></p>
 
 <h1>Cruises</h1>
 
+<div id='map' style='height:500px;width:500px'></div>
+
+<script>
+  var cruises = <%= @cruises.to_json.html_safe %>;
+  tomtom.setProductInfo('<your-product-name>', '<your-product-version>');
+        tomtom.L.map('map', {
+    key: "<%= ENV['TOMTOM_API_KEY'].html_safe %>",
+                source: 'vector',
+                basePath: '/tomtom_sdk'
+  });
+</script>
+
 <table>
   <thead>
     <tr>
-      <th>Line</th>
       <th>Code</th>
       <th>Start</th>
       <th>Days</th>
@@ -16,18 +30,11 @@
   <tbody>
     <% @cruises.each do |cruise| %>
       <tr>
-        <td><%= cruise.line %></td>
-        <td><%= cruise.code %></td>
-        <td><%= cruise.start %></td>
-        <td><%= cruise.days %></td>
+        <td><%= cruise['code'] %></td>
+        <td><%= cruise['start'] %></td>
+        <td><%= cruise['days'] %></td>
         <td><%= link_to 'Show', cruise %></td>
-        <td><%= link_to 'Edit', edit_cruise_path(cruise) %></td>
-        <td><%= link_to 'Destroy', cruise, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Cruise', new_cruise_path %>
