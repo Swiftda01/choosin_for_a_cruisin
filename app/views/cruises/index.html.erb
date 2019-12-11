@@ -1,10 +1,21 @@
-<script>
-  var cruises = <%= @cruises.to_json.html_safe %>;
-</script>
+<link rel='stylesheet' type='text/css' href='/tomtom_sdk/map.css'/>
+<script src='/tomtom_sdk/tomtom.min.js'></script>
 
 <p id="notice"><%= notice %></p>
 
 <h1>Cruises</h1>
+
+<div id='map' style='height:500px;width:500px'></div>
+
+<script>
+  var cruises = <%= @cruises.to_json.html_safe %>;
+  tomtom.setProductInfo('<your-product-name>', '<your-product-version>');
+        tomtom.L.map('map', {
+    key: "<%= ENV['TOMTOM_API_KEY'].html_safe %>",
+                source: 'vector',
+                basePath: '/tomtom_sdk'
+  });
+</script>
 
 <table>
   <thead>
