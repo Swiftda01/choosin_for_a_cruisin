@@ -34,13 +34,7 @@
         <td><%= cruise['start'] %></td>
         <td><%= cruise['days'] %></td>
         <td><%= link_to 'Show', cruise %></td>
-        <td><%= link_to 'Edit', edit_cruise_path(cruise) %></td>
-        <td><%= link_to 'Destroy', cruise, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Cruise', new_cruise_path %>

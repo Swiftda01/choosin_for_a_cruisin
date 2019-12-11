@@ -4,10 +4,10 @@ class CruisesController < ApplicationController
   # GET /cruises
   # GET /cruises.json
   def index
-    cruises = Cruise.joins(stops: :port).pluck(:id, 'cruises.code AS code', 'cruises.start AS start',
-                               'cruises.days AS days', 'cruises.price AS price',
-                               'ports.name AS port',
-                               'stops.d_from AS d_from', 'stops.d_to AS d_to')
+    cruises = Cruise.joins(stops: :port).pluck(:id, 'cruises.code', 'cruises.start',
+                               'cruises.days', 'cruises.price',
+                               'ports.name AS port', 'ports.lat', 'ports.lng',
+                               'stops.d_from', 'stops.d_to')
     @cruises = cruises.each_with_object({}) do |cruise, s|
       cruise_data = s[cruise[0]]
       unless cruise_data
@@ -15,7 +15,8 @@ class CruisesController < ApplicationController
                                        days: cruise[3], price: cruise[4],
                                        ports: [] }
       end
-      cruise_data[:ports] << { port: cruise[5], dFrom: cruise[6], dTo: cruise[7] }
+      cruise_data[:ports] << { port: cruise[5], lat: cruise[6], lng: cruise[7],
+                               dFrom: cruise[8], dTo: cruise[9] }
     end.values
   end
 
