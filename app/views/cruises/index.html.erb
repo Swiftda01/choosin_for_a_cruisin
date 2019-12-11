@@ -1,3 +1,7 @@
+<script>
+  var cruises = <%= @cruises.to_json.html_safe %>;
+</script>
+
 <p id="notice"><%= notice %></p>
 
 <h1>Cruises</h1>
@@ -5,7 +9,6 @@
 <table>
   <thead>
     <tr>
-      <th>Line</th>
       <th>Code</th>
       <th>Start</th>
       <th>Days</th>
@@ -16,10 +19,9 @@
   <tbody>
     <% @cruises.each do |cruise| %>
       <tr>
-        <td><%= cruise.line %></td>
-        <td><%= cruise.code %></td>
-        <td><%= cruise.start %></td>
-        <td><%= cruise.days %></td>
+        <td><%= cruise['code'] %></td>
+        <td><%= cruise['start'] %></td>
+        <td><%= cruise['days'] %></td>
         <td><%= link_to 'Show', cruise %></td>
         <td><%= link_to 'Edit', edit_cruise_path(cruise) %></td>
         <td><%= link_to 'Destroy', cruise, method: :delete, data: { confirm: 'Are you sure?' } %></td>
