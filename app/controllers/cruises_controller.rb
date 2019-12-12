@@ -8,15 +8,24 @@ class CruisesController < ApplicationController
                                'cruises.days', 'cruises.price',
                                'ports.name AS port', 'ports.lat', 'ports.lng',
                                'stops.d_from', 'stops.d_to')
+    @min_dt = DateTime.parse('9999-12-31')
+    @max_dt = DateTime.parse('0-1-1')
     @cruises = cruises.each_with_object({}) do |cruise, s|
+      d_from = cruise[8]
+      next if d_from.year > 2020
+
       cruise_data = s[cruise[0]]
       unless cruise_data
         cruise_data = s[cruise[0]] = { id: cruise[0], code: cruise[1], start: cruise[2],
                                        days: cruise[3], price: cruise[4],
-                                       ports: [] }
+                                       stops: [] }
       end
-      cruise_data[:ports] << { port: cruise[5], lat: cruise[6], lng: cruise[7],
-                               dFrom: cruise[8], dTo: cruise[9] }
+      d_from = cruise[8]
+      d_to = cruise[9]
+      @min_dt = d_to if @min_dt > d_to
+      @max_dt = d_from if @max_dt < d_from
+      cruise_data[:stops] << { port: cruise[5], lat: cruise[6], lng: cruise[7],
+                               dFrom: cruise[8].to_i, dTo: cruise[9].to_i }
     end.values
     @ports = Port.order(:code)
   end
