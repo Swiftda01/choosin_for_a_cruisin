@@ -45,18 +45,24 @@
           var lastStop = c.stops[c.stops.length - 1];
           isActive = c.stops[0].dFrom < curEpoch && lastStop.dTo > curEpoch;
           if (!isActive && activeCruises[c.code]) {
-            // Remove the marker
-            delete activeCruises[c.code];
+            var active = activeCruises[c.code];
+            map.removeLayer(active.m);  // Remove the marker
+            delete active;
           }
           if (isActive) {
             // %%% For lat and lng Figure out exact coordinates for this moment at a stop or between stops
-            if (!activeCruises[c.code])
-              activeCruises[c.code] = {c: c, m: marker(c.stops[0].lat, c.stops[0].lng, c.code)};
-            else {
-              console.log(activeCruises[c.code]);
-              activeCruises[c.code].m.setLatLng(
-                new L.LatLng(c.stops[0].lat, c.stops[0].lng)
-              );
+            var curStop = c.stops.find(function (s) {
+              return s.dFrom < curEpoch && s.dTo > curEpoch;
+            });
+            if (curStop.lat) {
+              if (!activeCruises[c.code])
+                activeCruises[c.code] = {c: c, m: marker(curStop.lat, curStop.lng, c.code)};
+              else {
+                console.log(activeCruises[c.code]);
+                activeCruises[c.code].m.setLatLng(
+                  new L.LatLng(curStop.lat, curStop.lng)
+                );
+              }
             }
           }
         });
