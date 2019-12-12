@@ -18,6 +18,7 @@ class CruisesController < ApplicationController
       cruise_data[:ports] << { port: cruise[5], lat: cruise[6], lng: cruise[7],
                                dFrom: cruise[8], dTo: cruise[9] }
     end.values
+    @ports = Port.order(:code)
   end
 
   # GET /cruises/1

@@ -10,11 +10,26 @@
 <script>
   var cruises = <%= @cruises.to_json.html_safe %>;
   tomtom.setProductInfo('<your-product-name>', '<your-product-version>');
-        tomtom.L.map('map', {
+  var map =  tomtom.L.map('map', {
     key: "<%= ENV['TOMTOM_API_KEY'].html_safe %>",
                 source: 'vector',
                 basePath: '/tomtom_sdk'
   });
+
+  // Figure out when the map is resized / moved
+
+  function marker(lat, lon, title) {
+    var marker = tomtom.L.marker([lat, lon], { title: title }).addTo(map);
+    marker.bindPopup(title);
+  }
+  <% @ports.each do |port|
+     next if port.lat < 4.9 || port.lat > 32.7 ||
+       port.lng < -97.4 || port.lng > -52.33505
+     %>
+
+    // console.log("Trying", <%= port.name.inspect.html_safe %>);
+    marker(<%= "#{port.lat}, #{port.lng}, #{port.name.inspect}".html_safe %>);
+  <% end %>
 </script>
 
 <table>
