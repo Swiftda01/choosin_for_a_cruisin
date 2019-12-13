@@ -1,3 +1,22 @@
+<style>
+#slider {
+  position: fixed;
+  height: 3%;
+  width: 100%;
+  bottom: 0%;
+  background-color: red;
+  z-index: 1;
+}
+
+.ui-draggable, .ui-droppable {
+  background-position: top;
+}
+</style>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
 <link rel='stylesheet' type='text/css' href='/tomtom_sdk/map.css'/>
 <script src='/tomtom_sdk/tomtom.min.js'></script>
 
@@ -5,16 +24,81 @@
 
 <h1>Cruises</h1>
 
-<div id='map' style='height:500px;width:500px'></div>
-
+<div id='map' style='height:750px;width:1100px'></div>
+<div id="slider"></div>
 <script>
+  // Set up the slider
+  var curDt, curEpoch;
+  var activeCruises = {};
+  $( function() {
+    $("#slider").slider({
+      min: <%= @min_dt.to_i %>,
+      max: <%= @max_dt.to_i %>,
+      slide: function(event, ui) {
+        curEpoch = ui.value;
+        curDt = new Date(0);
+        curDt.setUTCSeconds(curEpoch);
+        console.log(curDt);
+        // Find all active cruises
+        var isActive;
+        cruises.forEach(function (c) {
+          var lastStop = c.stops[c.stops.length - 1];
+          isActive = c.stops[0].dFrom < curEpoch && lastStop.dTo > curEpoch;
+          if (!isActive && activeCruises[c.code]) {
+            var active = activeCruises[c.code];
+            map.removeLayer(active.m);  // Remove the marker
+            delete active;
+          }
+          if (isActive) {
+            // %%% For lat and lng Figure out exact coordinates for this moment at a stop or between stops
+            var curStop = c.stops.find(function (s) {
+              return s.dFrom < curEpoch && s.dTo > curEpoch;
+            });
+            if (curStop.lat) {
+              if (!activeCruises[c.code])
+                activeCruises[c.code] = {c: c, m: marker(curStop.lat, curStop.lng, c.code)};
+              else {
+                console.log(activeCruises[c.code]);
+                activeCruises[c.code].m.setLatLng(
+                  new L.LatLng(curStop.lat, curStop.lng)
+                );
+              }
+            }
+          }
+        });
+        console.log(activeCruises);
+      }
+    });
+  });
+
   var cruises = <%= @cruises.to_json.html_safe %>;
   tomtom.setProductInfo('<your-product-name>', '<your-product-version>');
-        tomtom.L.map('map', {
+  var map =  tomtom.L.map('map', {
     key: "<%= ENV['TOMTOM_API_KEY'].html_safe %>",
                 source: 'vector',
-                basePath: '/tomtom_sdk'
+                basePath: '/tomtom_sdk',
+                // center: ,
+                // style: 'night',
+                // zoom: 15
   });
+
+  // Figure out when the map is resized / moved
+
+  function marker(lat, lon, title) {
+    var marker = tomtom.L.marker([lat, lon], {title: title}).addTo(map);
+    marker.bindPopup(title);
+    // marker.openPopup();
+    return marker;
+  }
+  <% @ports.each do |port|
+     # Confine it to the Caribbean
+     next if port.lat < 4.9 || port.lat > 32.7 ||
+       port.lng < -97.4 || port.lng > -52.33505
+     %>
+
+    // console.log("Trying", <%= port.name.inspect.html_safe %>);
+    // marker(<%= "#{port.lat}, #{port.lng}, #{port.name.inspect}".html_safe %>);
+  <% end %>
 </script>
 
 <table>
